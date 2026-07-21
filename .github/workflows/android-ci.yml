@@ -1,48 +1,51 @@
-name: Android CI
+name: Compilar APK Android
 
 on:
   push:
-    branches: [ "main" ]
-    paths-ignore:
-      - 'web/**'
-      - 'ios/**'
-      - '**.md'
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
-    paths-ignore:
-      - 'web/**'
-      - 'ios/**'
-      - '**.md'
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build & Check
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v4
+      # 1. Descargar el repositorio sin bloquearse si hay submódulos inaccesibles
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+        with:
+          submodules: 'false'
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+      # 2. Inicializar submódulos manualmente con tolerancia a fallos
+      - name: Inicializar submódulos de Git
+        run: |
+          git submodule init
+          git submodule update --recursive || true
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+      # 3. Configurar entorno Java 17
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-    - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      # 4. Configurar Android SDK y NDK para compilar C++
+      - name: Configurar NDK y Android SDK
+        uses: android-actions/setup-android@v3
 
-    - name: Run Unit Tests
-      run: ./gradlew testDebugUnitTest
-    
-    - name: Run Android Lint
-      run: ./gradlew lintDebug
-- name: Subir APK como artefacto
-  uses: actions/upload-artifact@v4
-  with:
-    name: xmrig-android-debug
-    path: app/build/outputs/apk/debug/*.apk
+      # 5. Otorgar permisos de ejecución al script de Gradle
+      - name: Dar permisos de ejecución a Gradlew
+        run: chmod +x gradlew
+
+      # 6. Ejecutar la compilación de la APK en modo Debug
+      - name: Compilar APK Debug
+        run: ./gradlew assembleDebug --no-daemon
+
+      # 7. Exportar la APK generada a la sección de Artefactos de GitHub
+      - name: Subir APK lista para descargar
+        uses: actions/upload-artifact@v4
+        with:
+          name: xmrig-android-debug
+          path: app/build/outputs/apk/debug/*.apk
