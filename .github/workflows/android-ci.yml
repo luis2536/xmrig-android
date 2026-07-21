@@ -10,11 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Descargar el código fuente base (sin submódulos bloqueantes)
+      # 1. Descargar el código fuente base (ignora submódulos conflictivos)
       - name: Descargar código fuente
         uses: actions/checkout@v4
         with:
           submodules: false
+          fetch-depth: 1
 
       # 2. Configurar entorno Java 17
       - name: Configurar Java 17
@@ -23,33 +24,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 3. Configurar Android SDK y NDK para C++
-      - name: Configurar NDK y Android SDK
-        uses: android-actions/setup-android@v3
-
-      # 4. Garantizar el código nativo de XMRig (Sustituye submódulos rotos)
-      - name: Preparar código fuente de XMRig
+      # 3. Descargar el motor XMRig en C++ de forma limpia
+      - name: Instalar Motor C++ de XMRig
         run: |
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git submodule update --init --recursive || true
-          
-          # Si la carpeta del motor C++ está vacía, clona el repositorio oficial de XMRig
-          if [ -d "app/src/main/cpp" ] && [ ! -f "app/src/main/cpp/xmrig/CMakeLists.txt" ]; then
-            echo "Submódulo incompleto o roto. Descargando XMRig oficial..."
-            rm -rf app/src/main/cpp/xmrig
-            git clone --depth 1 https://github.com/xmrig/xmrig.git app/src/main/cpp/xmrig
-          fi
+          echo "Limpiando directorio C++..."
+          rm -rf app/src/main/cpp/xmrig
+          echo "Clonando repositorio XMRig oficial..."
+          git clone --depth 1 https://github.com/xmrig/xmrig.git app/src/main/cpp/xmrig
 
-      # 5. Otorgar permisos de ejecución a Gradle
-      - name: Dar permisos de ejecución a Gradlew
-        run: chmod +x gradlew
+      # 4. Asignar permisos y compilar APK con Gradle
+      - name: Compilar APK con Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      # 6. Compilar APK en modo Debug
-      - name: Compilar APK Debug
-        run: ./gradlew assembleDebug --no-daemon
-
-      # 7. Subir el paquete APK a la sección de Artefactos
-      - name: Subir APK lista para descargar
+      # 5. Exportar la APK compilada para descargar
+      - name: Subir APK
         uses: actions/upload-artifact@v4
         with:
           name: xmrig-android-debug
