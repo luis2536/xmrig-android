@@ -1,57 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Nombre de la Aplicación -->
     <string name="app_name">Minero XMRig</string>
-
-    <!-- Pantalla de Minería -->
     <string name="mining_title">Gestión de Minería</string>
     <string name="start_mining">Iniciar minería</string>
     <string name="stop_mining">Detener minería</string>
-    <string name="mining_status_running">Minando</string>
+    <string name="mining_status_running">Minando en segundo plano</string>
     <string name="mining_status_stopped">Detenido</string>
 
-    <!-- Estadísticas -->
     <string name="stats_hashrate">Hashrate</string>
     <string name="stats_shares">Shares</string>
     <string name="stats_accepted">Aceptados</string>
     <string name="stats_rejected">Rechazados</string>
-    <string name="stats_success_rate">Tasa de éxito</string>
-    <string name="stats_cpu_usage">Uso de CPU</string>
-    <string name="stats_temperature">Temperatura</string>
-    <string name="stats_battery">Batería</string>
-    <string name="stats_difficulty">Dificultad</string>
-
-    <!-- Configuración -->
-    <string name="config_pool_url">Dirección del Pool</string>
-    <string name="config_wallet_address">Dirección de Billetera</string>
-    <string name="config_worker_name">Nombre del Minero</string>
-    <string name="config_threads">Número de Hilos</string>
-    <string name="config_max_cpu">Uso Máximo de CPU</string>
-
-    <!-- Errores -->
-    <string name="error_invalid_config">Configuración no válida</string>
-    <string name="error_start_failed">Error al iniciar</string>
-    <string name="error_stop_failed">Error al detener</string>
-    <string name="error_no_wallet">Por favor configure primero una dirección de billetera</string>
-
-    <!-- Notificaciones -->
-    <string name="notification_channel_name">Servicio de Minería</string>
-    <string name="notification_channel_desc">Muestra el estado y progreso de la minería</string>
-    <string name="notification_title">XMRig Minando</string>
-    <string name="notification_text">Hashrate actual: %s H/s</string>
-
-    <!-- Advertencias -->
-    <string name="warning_high_temp">Temperatura elevada</string>
-    <string name="warning_low_battery">Batería baja</string>
-    <string name="warning_mobile_data">Uso de datos móviles</string>
-
-    <!-- Información del Sistema -->
-    <string name="info_cpu_cores">Núcleos de CPU</string>
-    <string name="info_architecture">Arquitectura</string>
-    <string name="info_crypto_support">Soporte de extensiones criptográficas</string>
-
-    <!-- Descargo de Responsabilidad -->
-    <string name="disclaimer_title">Descargo de Responsabilidad</string>
-    <string name="disclaimer_message">Esta aplicación es únicamente para fines educativos. La minería en dispositivos móviles es muy poco eficiente, genera calor excesivo y consume batería rápidamente. Úsela bajo su propio riesgo.</string>
-    <string name="disclaimer_agree">Entendido</string>
+    
+    <string name="config_pool_url">Servidor Pool</string>
+    <string name="config_wallet_address">Billetera Monero</string>
+    <string name="config_worker_name">Nombre de Minero</string>
 </resources>
