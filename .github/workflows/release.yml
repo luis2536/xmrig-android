@@ -1,41 +1,46 @@
+name: Compilar APK Android
+
 on:
   push:
-    tags:
-      - 'v*'
-
-permissions:
-  contents: write
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build and Release APK
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+    steps:
+      # 1. Descargar el código fuente base (ignora submódulos conflictivos)
+      - name: Descargar código fuente
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          fetch-depth: 1
+
+      # 2. Configurar entorno Java 17
+      - name: Configurar Java 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: Grant Execute Permission for Gradle
-        run: chmod +x gradlew
+      # 3. Descargar el motor XMRig en C++ de forma limpia
+      - name: Instalar Motor C++ de XMRig
+        run: |
+          echo "Limpiando directorio C++..."
+          rm -rf app/src/main/cpp/xmrig
+          echo "Clonando repositorio XMRig oficial..."
+          git clone --depth 1 https://github.com/xmrig/xmrig.git app/src/main/cpp/xmrig
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug
+      # 4. Asignar permisos y compilar APK con Gradle
+      - name: Compilar APK con Gradle
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
+      # 5. Exportar la APK compilada para descargar
+      - name: Subir APK
+        uses: actions/upload-artifact@v4
         with:
-          files: |
-            app/build/outputs/apk/debug/app-debug.apk
-          name: Release ${{ github.ref_name }}
-          draft: false
-          prerelease: false
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: xmrig-android-debug
+          path: app/build/outputs/apk/debug/*.apk
